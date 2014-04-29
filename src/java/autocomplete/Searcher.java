@@ -58,8 +58,6 @@ public class Searcher extends HttpServlet {
         response.setContentType("text/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             if (request.getParameter("q") != null && request.getParameter("q").length() > 0) {
-                out.println(" q = " + request.getParameter("q"));
-                out.println();
                 
                 SolrQuery query = new SolrQuery();
                 QueryResponse rsp;
@@ -68,15 +66,21 @@ public class Searcher extends HttpServlet {
                     rsp = solrServer.query(query);
                     SolrDocumentList docs = rsp.getResults();
                     Iterator<SolrDocument> iter = docs.iterator();
+                    out.print("[");
+                    boolean first = true;
                     while (iter.hasNext()) {
                         SolrDocument resultDoc = iter.next();
-
+                        if(first){
+                            first = false;
+                        }else{
+                            out.print(",");
+                        }
                         String id = (String) resultDoc.getFieldValue("id");
-                        out.println("- " + id);
+                        out.print("{\"id\":\"" + id + "\",");
                         String name = (String) resultDoc.getFieldValue("name");
-                        out.println("  " + name);
-                        out.println();
+                        out.print("\"name\":\"" + name + "\"}");
                     }
+                    out.println("]");
                 } catch (SolrServerException ex) {
                     out.println(ex);
                     Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
