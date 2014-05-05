@@ -92,6 +92,9 @@ public class Searcher extends HttpServlet {
     }
     
     private String escapeString(String s) {
+        if(s == null){
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (char c : s.toCharArray()) {
             if (c == '\"' | c == '\\') {

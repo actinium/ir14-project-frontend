@@ -39,6 +39,9 @@ var SearchBox = (function () {
                     self.selectedSuggestion = -1;
                 }else{
                     searchButton.click();
+                    self.inputField.blur();
+                    self.setSuggestions([]);
+                    self.selectedSuggestion = -1;
                 }
             }else if(evt.keyCode === 27){
                 // Esc pressed
