@@ -6,20 +6,33 @@ var SearchBox = (function () {
     	self.searchButton = searchButton;
     	self.suggestionsList = suggestionBox;
         self.suggestions = [];
-    	
-        self.inputField.oninput = function(){ 
+        
+        self.inputField.oninput = function(){
+            self.selectedSuggestion = -1;
             getSuggestions(self.inputField.value, self.setSuggestions);
         };
         self.inputField.onkeydown = function(evt) {
             evt = evt || window.event;
             if (evt.keyCode === 38) {
+                // Up arrow pressed
                 evt.preventDefault();
-                
+                if(self.selectedSuggestion > 0){
+                    self.suggestionsList.children[self.selectedSuggestion].className = '';
+                    self.selectedSuggestion -= 1;
+                    self.suggestionsList.children[self.selectedSuggestion].className = 'selected';
+                }
             }else if(evt.keyCode === 40){
+                // Down arrow pressed
                 evt.preventDefault();
-                
+                if(self.selectedSuggestion < self.suggestions.length){
+                    if(self.selectedSuggestion !== -1){
+                        self.suggestionsList.children[self.selectedSuggestion].className = '';
+                    }
+                    self.selectedSuggestion += 1;
+                    self.suggestionsList.children[self.selectedSuggestion].className = 'selected';
+                }
             }else if(evt.keyCode === 13){
-                
+                // Enter pressed
             }
         };
         self.setSuggestions = function (suggestions) {
