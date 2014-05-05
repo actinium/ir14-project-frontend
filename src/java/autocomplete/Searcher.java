@@ -21,8 +21,9 @@ import org.apache.solr.common.SolrDocumentList;
 
 @WebServlet(name = "Searcher", urlPatterns = {"/Searcher"})
 public class Searcher extends HttpServlet {
+
     private final SolrServer solrServer;
-    
+
     public Searcher() {
         HttpSolrServer httpSolrServer = new HttpSolrServer("http://localhost:8983/solr");
         httpSolrServer.setMaxRetries(1); // defaults to 0.  > 1 not recommended.
@@ -57,8 +58,9 @@ public class Searcher extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            out.print("[");
             if (request.getParameter("q") != null && request.getParameter("q").length() > 0) {
-                
+
                 SolrQuery query = new SolrQuery();
                 QueryResponse rsp;
                 try {
@@ -66,27 +68,39 @@ public class Searcher extends HttpServlet {
                     rsp = solrServer.query(query);
                     SolrDocumentList docs = rsp.getResults();
                     Iterator<SolrDocument> iter = docs.iterator();
-                    out.print("[");
                     boolean first = true;
                     while (iter.hasNext()) {
                         SolrDocument resultDoc = iter.next();
-                        if(first){
+                        if (first) {
                             first = false;
-                        }else{
+                        } else {
                             out.print(",");
                         }
                         String id = (String) resultDoc.getFieldValue("id");
-                        out.print("{\"id\":\"" + id + "\",");
+                        out.print("{\"id\":\"" + escapeString(id) + "\",");
                         String name = (String) resultDoc.getFieldValue("name");
-                        out.print("\"name\":\"" + name + "\"}");
+                        out.print("\"name\":\"" + escapeString(name) + "\"}");
                     }
-                    out.println("]");
                 } catch (SolrServerException ex) {
-                    out.println(ex);
                     Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
+                } catch( Exception e){
+                    Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, e);
                 }
             }
+            out.println("]");
         }
+    }
+    
+    private String escapeString(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (c == '\"' | c == '\\') {
+                sb.append("\\").append(c);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -115,7 +129,7 @@ public class Searcher extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            processRequest(request, response);
+        processRequest(request, response);
     }
 
     /**

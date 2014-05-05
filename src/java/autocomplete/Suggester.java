@@ -21,6 +21,7 @@ import org.apache.solr.common.util.NamedList;
 public class Suggester extends HttpServlet {
 
     SolrServer solr = new HttpSolrServer("http://localhost:8983/solr");
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -35,30 +36,45 @@ public class Suggester extends HttpServlet {
         response.setContentType("text/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             out.print("[");
-            if (request.getParameter("q") != null && request.getParameter("q").length() > 0) {
-                ModifiableSolrParams params = new ModifiableSolrParams();
-                params.set("qt", "/suggest");
-                params.set("q", request.getParameter("q"));
-                try {
-                    QueryResponse qr = solr.query(params);
-                    NamedList splchc = (NamedList)qr.getResponse().get("spellcheck");
-                    NamedList suggs = (NamedList)splchc.get("suggestions");
-                    NamedList b = (NamedList)suggs.get(request.getParameter("q"));
-                    if(b != null){
-                        ArrayList sugg = (ArrayList)b.get("suggestion");
-                        for(int i=0; i < sugg.size(); i++){
-                            if(i>0){
-                                out.print(",");
+            try {
+                if (request.getParameter("q") != null && request.getParameter("q").length() > 0) {
+                    ModifiableSolrParams params = new ModifiableSolrParams();
+                    params.set("qt", "/suggest");
+                    params.set("q", request.getParameter("q"));
+                    params.set("spellcheck", true);
+                    try {
+                        QueryResponse qr = solr.query(params);
+                        NamedList splchc = (NamedList) qr.getResponse().get("spellcheck");
+                        NamedList suggs = (NamedList) splchc.get("suggestions");
+                        NamedList b = (NamedList) suggs.get(request.getParameter("q"));
+                        if (b != null) {
+                            ArrayList sugg = (ArrayList) b.get("suggestion");
+                            for (int i = 0; i < sugg.size(); i++) {
+                                if (i > 0) {
+                                    out.print(",");
+                                }
+                                out.print("\"" + escapeString((String) sugg.get(i)) + "\"");
                             }
-                            out.print("\"" + sugg.get(i).toString() + "\"");
                         }
+                    } catch (SolrServerException ex) {
+                        Logger.getLogger(Suggester.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (SolrServerException ex) {
-                    Logger.getLogger(Suggester.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
+            } catch (Exception e) {}
             out.print("]");
         }
+    }
+
+    private String escapeString(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (c == '\"' | c == '\\') {
+                sb.append("\\").append(c);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
