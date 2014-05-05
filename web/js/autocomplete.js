@@ -1,10 +1,10 @@
 var SearchBox = (function () {
-    function SearchBox(inputField, searchButton, suggestionBox, getSuggestions) {
+    function SearchBox(inputField, searchButton, suggestionList, getSuggestions) {
         var self = this;
         self.selectedSuggestion = -1;
         self.inputField = inputField;
     	self.searchButton = searchButton;
-    	self.suggestionsList = suggestionBox;
+    	self.suggestionsList = suggestionList;
         self.suggestions = [];
         
         self.inputField.oninput = function(){
@@ -33,6 +33,16 @@ var SearchBox = (function () {
                 }
             }else if(evt.keyCode === 13){
                 // Enter pressed
+                if(self.selectedSuggestion !== -1){
+                    self.inputField.value = self.suggestions[self.selectedSuggestion];
+                    getSuggestions(self.inputField.value, self.setSuggestions);
+                    self.selectedSuggestion = -1;
+                }else{
+                    searchButton.click();
+                }
+            }else if(evt.keyCode === 27){
+                // Esc pressed
+                
             }
         };
         self.setSuggestions = function (suggestions) {

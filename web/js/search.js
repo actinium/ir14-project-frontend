@@ -10,7 +10,6 @@
             if (request.status >= 200 && request.status < 400) {
                 // Success!
                 var data = JSON.parse(request.responseText);
-                console.log(data);
                 var str = '';
                 for(var d in data){
                     str += '<div class="result-box">';
