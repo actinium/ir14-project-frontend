@@ -40,7 +40,7 @@ public class Suggester extends HttpServlet {
                 if (request.getParameter("q") != null && request.getParameter("q").length() > 0) {
                     ModifiableSolrParams params = new ModifiableSolrParams();
                     params.set("qt", "/suggest");
-                    params.set("q", request.getParameter("q"));
+                    params.set("spellcheck.q", request.getParameter("q"));
                     params.set("spellcheck", true);
                     try {
                         QueryResponse qr = solr.query(params);
