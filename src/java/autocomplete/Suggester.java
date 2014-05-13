@@ -64,7 +64,7 @@ public class Suggester extends HttpServlet {
                                 if (i > 0) {
                                     out.print(",");
                                 }
-                                out.print("\"" + escapeString(prefix) + escapeString((String) sugg.get(i)) + "\"");
+                                out.print("\"" /*+ escapeString(prefix)*/ + escapeString((String) sugg.get(i)) + "\"");
                             }
                         }
                     } catch (SolrServerException ex) {

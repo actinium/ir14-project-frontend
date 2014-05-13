@@ -79,7 +79,11 @@ public class Searcher extends HttpServlet {
                         String id = (String) resultDoc.getFieldValue("id");
                         out.print("{\"id\":\"" + escapeString(id) + "\",");
                         String name = (String) resultDoc.getFieldValue("name");
-                        out.print("\"name\":\"" + escapeString(name) + "\"}");
+                        out.print("\"name\":\"" + escapeString(name) + "\",");
+                        String party = (String) resultDoc.getFieldValue("party");
+                        out.print("\"party\":\"" + escapeString(party) + "\",");
+                        String content = (String) resultDoc.getFieldValue("content");
+                        out.print("\"content\":\"" + escapeString(content) + "\"}");
                     }
                 } catch (SolrServerException ex) {
                     Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);

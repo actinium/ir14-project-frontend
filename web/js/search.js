@@ -13,8 +13,10 @@
                 var str = '';
                 for(var d in data){
                     str += '<div class="result-box">';
-                    str += '<p class="label">' + data[d].id + '</p>';
-                    str += '<p>' + data[d].name + '</p>';
+                    str += '<details>';
+                    str += '<summary><p class="label">' + data[d].name + ' (' + data[d].party + ')' + '</p></summary>';
+                    str += '<p>' + data[d].content + '</p>';
+                    str += '</details>';
                     str += '</div>';
                 }
                 resultList.innerHTML = str;
