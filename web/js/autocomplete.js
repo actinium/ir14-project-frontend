@@ -68,7 +68,7 @@ var SearchBox = (function () {
 
 function getSuggestions(str, callback){
     var request = new XMLHttpRequest();
-    request.open('GET', '/AutoComplete/Suggester?q=' + str, true);
+    request.open('POST', '/AutoComplete/Suggester?q=' + str, true);
 
     request.onload = function() {
       if (request.status >= 200 && request.status < 400){
