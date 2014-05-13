@@ -3,6 +3,7 @@ package autocomplete;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -46,14 +47,24 @@ public class Suggester extends HttpServlet {
                         QueryResponse qr = solr.query(params);
                         NamedList splchc = (NamedList) qr.getResponse().get("spellcheck");
                         NamedList suggs = (NamedList) splchc.get("suggestions");
-                        NamedList b = (NamedList) suggs.get(request.getParameter("q"));
+                        
+                        StringTokenizer st = new StringTokenizer(request.getParameter("q"), " ");
+                        String prefix = "";
+                        String q = ""; 
+                        while(st.hasMoreTokens()){
+                            if(!q.equals("")){
+                                prefix += q + " ";
+                            }
+                            q = st.nextToken();
+                        }
+                        NamedList b = (NamedList) suggs.get(q);
                         if (b != null) {
                             ArrayList sugg = (ArrayList) b.get("suggestion");
                             for (int i = 0; i < sugg.size(); i++) {
                                 if (i > 0) {
                                     out.print(",");
                                 }
-                                out.print("\"" + escapeString((String) sugg.get(i)) + "\"");
+                                out.print("\"" + escapeString(prefix) + escapeString((String) sugg.get(i)) + "\"");
                             }
                         }
                     } catch (SolrServerException ex) {
