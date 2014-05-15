@@ -48,6 +48,11 @@ var SearchBox = (function () {
                 
             }
         };
+        self.inputField.onblur = function(){
+            self.selectedSuggestion = -1;
+            getSuggestions("", self.setSuggestions);
+        };
+        self.inputField.onfocus = self.inputField.oninput;
         self.setSuggestions = function (suggestions) {
             self.suggestions = suggestions;
             
